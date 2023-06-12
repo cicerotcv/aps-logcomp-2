@@ -1,7 +1,7 @@
 
-PROGRAM       = { FUNCTION_DECLARATION | VARIABLE_DECLARATION | CONST_DECLARATION | STATEMENT } ;
+PROGRAM       = { FUNCTION_DECLARATION | STATEMENT } ;
 
-VARIABLE_DECLARATION = "seja" , IDENTIFIER , [ "=" , EXPRESSION ] , ";" ;
+VARIABLE_DECLARATION = "seja" , IDENTIFIER , "=" , EXPRESSION , ";" ;
 
 CONST_DECLARATION = "constante" , IDENTIFIER, "=", EXPRESSION , ";" ;
 
@@ -9,32 +9,37 @@ FUNCTION_DECLARATION = "funcao" , IDENTIFIER , "(" , [ PARAMETER { "," , PARAMET
 
 PARAMETER      = IDENTIFIER ;
 
-STATEMENT      = ( ASSIGNMENT | CONDITIONAL | LOOP | FUNCTION_CALL | BLOCK ) , ";" ;
+STATEMENT      = ( ASSIGNMENT | VARIABLE_DECLARATION | CONST_DECLARATION | FUNCTION_DECLARATION | CONDITIONAL | LOOP | FUNCTION_CALL | BLOCK | RETURN ) , ";" ;
 
 BLOCK          = "{" , { STATEMENT } , "}" ;
 
 ASSIGNMENT     = IDENTIFIER , "=" , EXPRESSION ;
 
-EXPRESSION     = OPERAND , { OPERATOR , OPERAND } ;
+REL_EXPRESSION = EXPRESSION { COMPARISON, EXPRESSION } ;
+EXPRESSION     = TERM , { OPERATOR , TERM } ;
+TERM           = FACTOR , { PRIORITY_OP, FACTOR } ;
+FACTOR         = NUMBER | BOOLEAN | STRING | OPERATOR , { FACTOR } | IDENTIFIER | "(" , FACTOR, ")" ;
 
-OPERAND        = IDENTIFIER | NUMBER ;
+OPERATOR       = "+" | "-" ;
 
-OPERATOR       = "+" | "-" | "*" | "/" ;
+PRIORITY_OP    = "\*" | "/" ;
 
-COMPARISON     = "==" | "!=" | "<" | ">" | "<=" | ">=" ;
+COMPARISON     = "==" | "<" | ">" ;
 
-CONDITIONAL    = "se" , "(" , EXPRESSION , COMPARISON , EXPRESSION , ")" , STATEMENT , [ "senao" , STATEMENT ] ;
+CONDITIONAL    = "se" , "(" , REL_EXPRESSION , ")" , BLOCK , [ "senao" , BLOCK ] ;
 
-LOOP           = ( "enquanto" | "para" ) , "(" , IDENTIFIER , "=" , EXPRESSION , COMPARISON , EXPRESSION , [ INCREMENT ] , ")" , STATEMENT ;
+LOOP           = "enquanto" , "(" , REL_EXPRESSION, ")" , BLOCK ;
 
-INCREMENT     = ( "++" | "--" ) ;
+FUNCTION_CALL  = IDENTIFIER , "(" , \[ REL_EXPRESSION { "," , REL_EXPRESSION } \] , ")" ;
 
-FUNCTION_CALL = IDENTIFIER , "(" , [ EXPRESSION { "," , EXPRESSION } ] , ")" ;
-
-IDENTIFIER  = CHARACTER , { CHARACTER | DIGIT | "_" } ;
+IDENTIFIER     = CHARACTER , { CHARACTER | DIGIT | "\_" } ;
 
 NUMBER         = DIGIT , { DIGIT } ;
 
-CHARACTER          = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z" | "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" ;
+BOOLEAN        = "verdadeiro" | "falso" ;
 
-DIGIT         = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+STRING         = '"' , { CHARACTER }, '"' ;
+
+CHARACTER      = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z" | "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" ;
+
+DIGIT          = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
